@@ -4,131 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Feliz Cumpleaños</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:#000;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Georgia',serif;overflow:hidden;}
-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;}
 
-.scene{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;width:100%;padding:1rem;}
-
-/* EXPLOSION OVERLAY */
-#explosionOverlay{
-  position:fixed;top:0;left:0;width:100%;height:100%;
-  z-index:50;pointer-events:none;
-  display:none;
-}
-.lily-particle{
-  position:absolute;
-  pointer-events:none;
-  transform-origin:center center;
-  animation:lilyFly 1.4s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
-}
-@keyframes lilyFly{
-  0%{opacity:1;transform:translate(0,0) rotate(var(--rot0)) scale(0.2);}
-  30%{opacity:1;transform:translate(var(--tx30),var(--ty30)) rotate(var(--rot30)) scale(1.1);}
-  70%{opacity:0.9;transform:translate(var(--tx70),var(--ty70)) rotate(var(--rot70)) scale(0.85);}
-  100%{opacity:0;transform:translate(var(--tx),var(--ty)) rotate(var(--rotEnd)) scale(0.4);}
-}
-
-/* SOBRE */
-.envelope-wrap{display:flex;flex-direction:column;align-items:center;gap:1rem;cursor:pointer;}
-.envelope{width:260px;height:180px;position:relative;transition:transform 0.3s;}
-.envelope:hover{transform:scale(1.04);}
-.env-body{width:260px;height:180px;background:linear-gradient(135deg,#1a0020,#0d0015);border:1.5px solid rgba(255,80,180,0.5);border-radius:6px;position:absolute;bottom:0;}
-.env-flap{width:0;height:0;border-left:130px solid transparent;border-right:130px solid transparent;border-top:90px solid #120018;position:absolute;top:0;left:0;filter:drop-shadow(0 1px 0 rgba(255,80,180,0.4));transition:transform 0.6s ease,opacity 0.4s;transform-origin:top center;z-index:5;}
-.env-flap.open{transform:rotateX(180deg);opacity:0;}
-.env-left{width:0;height:0;border-bottom:90px solid #150019;border-right:130px solid transparent;position:absolute;bottom:0;left:0;}
-.env-right{width:0;height:0;border-bottom:90px solid #180020;border-left:130px solid transparent;position:absolute;bottom:0;right:0;}
-.env-heart{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2rem;color:#ff50b4;text-shadow:0 0 15px rgba(255,80,180,0.9);z-index:6;transition:opacity 0.3s;}
-.open-hint{color:rgba(255,80,180,0.7);font-size:0.8rem;letter-spacing:0.2em;text-transform:uppercase;animation:pulse 2s infinite;}
-.env-title{color:#ff50b4;font-size:1.4rem;letter-spacing:0.15em;text-shadow:0 0 12px rgba(255,80,180,0.7);}
-@keyframes pulse{0%,100%{opacity:0.5;}50%{opacity:1;}}
-
-/* LIBRO */
-.book-wrap{display:none;align-items:center;justify-content:center;gap:1.2rem;width:100%;max-width:700px;}
-.book-wrap.visible{display:flex;}
-
-.arrow-btn{background:none;border:1.5px solid rgba(255,80,180,0.45);color:#ff80c8;width:42px;height:42px;border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;text-shadow:0 0 8px rgba(255,80,180,0.6);box-shadow:0 0 10px rgba(255,80,180,0.1);}
-.arrow-btn:hover{background:rgba(255,80,180,0.12);border-color:rgba(255,80,180,0.8);box-shadow:0 0 18px rgba(255,80,180,0.3);}
-.arrow-btn:disabled{opacity:0.2;cursor:default;}
-
-.page-stack{position:relative;width:320px;min-height:440px;flex-shrink:0;}
-.page{
-  position:absolute;top:0;left:0;width:100%;
-  background:rgba(10,0,18,0.88);
-  border:1.5px solid rgba(255,80,180,0.3);
-  border-radius:14px;
-  padding:2rem 2rem 2.5rem;
-  display:flex;flex-direction:column;
-  min-height:440px;
-  backdrop-filter:blur(10px);
-  box-shadow:0 0 40px rgba(255,80,180,0.08);
-  opacity:0;pointer-events:none;
-  transform:translateX(60px) scale(0.97);
-  transition:opacity 0.4s ease, transform 0.4s ease;
-}
-.page.active{opacity:1;pointer-events:all;transform:translateX(0) scale(1);}
-.page.exit-left{opacity:0;transform:translateX(-60px) scale(0.97);}
-.page.exit-right{opacity:0;transform:translateX(60px) scale(0.97);}
-
-.page-header{text-align:center;margin-bottom:1.2rem;}
-.page-name{font-size:2rem;font-weight:700;letter-spacing:0.15em;color:#ff50b4;text-shadow:0 0 12px rgba(255,80,180,0.8),0 0 30px rgba(255,80,180,0.4);}
-.page-divider{width:100%;height:1px;background:linear-gradient(to right,transparent,rgba(255,80,180,0.45),transparent);margin:0.8rem 0;}
-.page-body{flex:1;color:rgba(255,225,242,0.85);font-size:0.98rem;line-height:1.9;font-style:italic;}
-.page-footer{margin-top:1.2rem;text-align:center;color:rgba(255,80,180,0.4);font-size:0.75rem;letter-spacing:0.2em;}
-.page-num{margin-top:0.6rem;text-align:center;color:rgba(255,80,180,0.3);font-size:0.72rem;letter-spacing:0.15em;}
-.lined{width:100%;height:100%;min-height:280px;}
-.line{width:100%;height:1px;background:rgba(255,80,180,0.1);margin-bottom:1.55rem;}
-
-/* COLLAGE */
-.collage-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 3px;
-  width: 100%;
-  height: 280px;
-  border-radius: 8px;
-  overflow: hidden;
-}
-.collage-cell {
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.3s ease, z-index 0s;
-}
-.collage-cell:hover {
-  transform: scale(1.08);
-  z-index: 10;
-}
-.collage-cell img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: filter 0.3s;
-}
-.collage-cell:hover img {
-  filter: brightness(1.15) saturate(1.2);
-}
-.collage-label {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
-  color: rgba(255,200,235,0.9);
-  font-size: 0.55rem;
-  text-align: center;
-  padding: 6px 2px 3px;
-  letter-spacing: 0.05em;
-  font-style: italic;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.collage-cell:hover .collage-label {
-  opacity: 1;
-}
-
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -136,6 +13,15 @@ canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;}
 
 <!-- EXPLOSION OVERLAY -->
 <div id="explosionOverlay"></div>
+
+<div id="passwordScreen" class="password-screen">
+  <div class="password-box">
+    <h2>💌</h2>
+    <input type="password" id="passwordInput" placeholder="Pon tu nombre" autocomplete="off">
+    <p id="passwordError"></p>
+  </div>
+</div>
+
 
 <div class="scene">
 
@@ -172,22 +58,12 @@ canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;}
         <div class="page-footer">✦ &nbsp; ✦ &nbsp; ✦</div>
       </div>
 
-      <div class="page" id="p1">
-        <div class="page-header"><div class="page-hearts">🤍🤍🤍</div><div class="page-divider"></div></div>
-        <div class="page-body"><div class="lined" id="lined1"></div></div>
-        <div class="page-num">1 / 3</div>
-      </div>
-      <div class="page" id="p2">
-        <div class="page-header"><div class="page-hearts">🤍🤍🤍</div><div class="page-divider"></div></div>
-        <div class="page-body"><div class="lined" id="lined2"></div></div>
-        <div class="page-num">2 / 3</div>
-      </div>
-      <div class="page" id="p3">
-        <div class="page-header"><div class="page-hearts">🤍🤍🤍</div><div class="page-divider"></div></div>
-        <div class="page-body"><div class="lined" id="lined3"></div></div>
-        <div class="page-footer" style="margin-top:1.5rem;">Con todo mi amor ♡</div>
-        <div class="page-num">3 / 3</div>
-      </div><div class="page" id="p5">
+
+<div class="page" id="p1"><div class="page-header"><div class="page-hearts">🤍🤍🤍</div><div class="page-divider"></div></div><div class="page-body">Feliz cumpleañoooooos mi vidaaaa, espero que este día tan importante lo pases geniaaaal, esta fecha antes de conocerte para mí era una fecha normal y corriente, pero ahora es una de las fechas más importantes de mi vida ya que es el día en el que nació el amor de mi vida, hoy cumples ya 16 añitos, ya eres una mini adulta eeeh jajajajajajajaj.</div><div class="page-footer">♡♡♡</div><div class="page-num">1 / 4</div></div>
+<div class="page" id="p2"><div class="page-header"><div class="page-hearts">🤍🤍🤍</div><div class="page-divider"></div></div><div class="page-body">Mi vida quiero que sepas que estoy súper orgulloso de la mujer que eres, eres muy fuerte amor y puedes con todo, eres una mujer que vale millones y eso quiero que lo tengas siempre en mente, he tenido mucha suerte de que hayas aparecido en mi vida, y me encantaría seguir a tu lado en todos los cumpleaños que tengas.</div><div class="page-footer">♡♡♡</div><div class="page-num">2 / 4</div></div>
+<div class="page" id="p3"><div class="page-header"><div class="page-hearts">🤍🤍🤍</div><div class="page-divider"></div></div><div class="page-body">Quizás aún no pueda estar presente, pero en los siguientes años si que intentaré ir amor.<br><br>Quiero volver a decirte que eres perfecta mi vida, eres la mujer con la que he soñado toda mi vida y con la que quiero estar para siempre, quiero vivir millones de cosas junto a ti.</div><div class="page-footer">♡♡♡</div><div class="page-num">3 / 4</div></div>
+<div class="page" id="p4"><div class="page-header"><div class="page-hearts">🤍🤍🤍</div><div class="page-divider"></div></div><div class="page-body">Quiero poder decirle a nuestros hijos en un futuro que sus papás se conocieron desde jóvenes y que se siguen amando con locura desde hace muchos años, quiero que seas mi esposa en un futuro y si no es mucho pedir que te quedes conmigo para siempre amor. Eres y siempre serás la mujer de mi corazón, el amor de mi vida y sobretodo mi princesita.<br><br>Te amo demasiado mi amor 🤍</div><div class="page-footer">♡♡♡</div><div class="page-num">4 / 4</div></div>
+<div class="page" id="p5">
         <div style="
           position:absolute;top:0;left:0;right:0;bottom:0;
           background:#000;
@@ -329,8 +205,14 @@ draw();
 
 // Líneas de papel
 ['lined1','lined2','lined3'].forEach(id=>{
-  const d=document.getElementById(id);
-  for(let i=0;i<13;i++){const l=document.createElement('div');l.className='line';d.appendChild(l);}
+  const d = document.getElementById(id);
+  if(!d) return;
+
+  for(let i=0;i<13;i++){
+    const l=document.createElement('div');
+    l.className='line';
+    d.appendChild(l);
+  }
 });
 
 // ── EXPLOSIÓN DE LIRIOS ──
@@ -400,25 +282,35 @@ function launchLilyExplosion(originX, originY) {
   setTimeout(() => { overlay.style.display = 'none'; }, 2200);
 }
 
-// ── Sobre → abrir ──
+// ── Contraseña ──
 const envWrap=document.getElementById('envWrap');
 const bookWrap=document.getElementById('bookWrap');
 const flap=document.getElementById('flap');
 const envHeart=document.getElementById('envHeart');
+const passwordScreen=document.getElementById('passwordScreen');
+const passwordInput=document.getElementById('passwordInput');
+const passwordError=document.getElementById('passwordError');
 
-envWrap.addEventListener('click', (e) => {
+function abrirCarta(){
   const rect = envWrap.getBoundingClientRect();
   const ox = rect.left + rect.width / 2;
   const oy = rect.top + rect.height / 2;
-
   launchLilyExplosion(ox, oy);
-
   flap.classList.add('open');
-  envHeart.style.opacity = '0';
-  setTimeout(() => {
-    envWrap.style.display = 'none';
+  envHeart.style.opacity='0';
+  setTimeout(()=>{
+    passwordScreen.style.display='none';
+    envWrap.style.display='none';
     bookWrap.classList.add('visible');
-  }, 700);
+  },700);
+}
+
+passwordInput.addEventListener('input',()=>{
+  if(passwordInput.value.trim().toLowerCase()==='julia'){
+    abrirCarta();
+  }else{
+    passwordError.textContent='';
+  }
 });
 
 // ── Paginación ──
